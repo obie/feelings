@@ -60,9 +60,8 @@ f.like?("a security incident", at_least: 0.8) # true, false, or nil
 ## The maybe branch and the 0.3/0.7 bands
 
 Declaring a `maybe` branch inside a `like` block turns the yes/maybe/no split into bands
-automatically, even with no `at_least:` given. This is branch registration, not source
-introspection: the bands turn on because you called `mood.maybe { ... }` while the block was
-being collected, not because the source text mentions `maybe`.
+automatically, even with no `at_least:` given. The bands turn on because `mood.maybe { ... }`
+was called while the block was being collected.
 
 ```ruby
 result = Feelings("draft").like("jargon") do |mood|
@@ -83,8 +82,8 @@ Given a probability `p` for the value feeling like the description:
 - **With neither `at_least:` nor a `maybe` branch:** there's no maybe zone. The split is at
   0.5: `p >= 0.5` is `"yes"`, otherwise `"no"`.
 
-A `like` block with `yes`/`no` branches and no `maybe` branch stays at the 0.5 split even at a
-probability of exactly 0.5, it lands on `yes`.
+A `like` block with `yes` and `no` branches and no `maybe` branch stays at the 0.5 split. A
+probability of exactly 0.5 lands on `yes`.
 
 Inside `Feelings.chaos`, a draw substitutes for the threshold comparison outside the band: `yes`
 wins when the draw is less than the probability, `no` otherwise. See
@@ -105,8 +104,7 @@ f.like?("spam", at_least: 0.8) # no second request
 ## Symbols vs strings
 
 Pass a `String` to describe the question inline, or a `Symbol` to look it up in the
-[registry](registry.md). An unregistered symbol is humanized (underscores become spaces) rather
-than raising:
+[registry](registry.md). An unregistered symbol is humanized: underscores become spaces.
 
 ```ruby
 f.like?(:spam)          # registry lookup if :spam is registered
