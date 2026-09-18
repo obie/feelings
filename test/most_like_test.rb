@@ -51,7 +51,7 @@ class MostLikeTest < Minitest::Test
     assert_raises(Feelings::BadLabels) { Feelings("mail").most_like(huge) }
   end
 
-  def test_labels_reject_numeric_only_keys
-    assert_raises(Feelings::BadLabels) { Feelings("mail").most_like({ "1": "one", "2": "two" }) }
+  def test_labels_reject_numeric_only_descriptions
+    assert_raises(Feelings::BadLabels) { Feelings("mail").most_like(low: "1", high: "2") }
   end
 end

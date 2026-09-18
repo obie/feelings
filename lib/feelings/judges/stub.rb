@@ -50,16 +50,24 @@ module Feelings
         raise JudgeError, "Stub has no noul answer for #{description.inspect}"
       end
 
+      # A choice is answered by the first stub entry that fits the criteria:
+      # a registered set name whose keys match, a Symbol or String naming
+      # one of the options, or a Hash of option => probability over them.
       def build_choice(question)
-        keys = (question["criteria"] || {}).keys.sort
+        keys = (question["criteria"] || {}).keys.map(&:to_s).sort
 
         @answers.each do |key, value|
-          next unless key.is_a?(Symbol)
+          registered = key.is_a?(Symbol) ? Feelings[key] : nil
+          if registered.is_a?(Hash) && registered.keys.map(&:to_s).sort == keys
+            return choice_result(value)
+          end
 
-          registered = Feelings[key]
-          next unless registered.is_a?(Hash) && registered.keys.map(&:to_s).sort == keys
-
-          return choice_result(value)
+          case value
+          when Symbol, String
+            return choice_result(value) if keys.include?(value.to_s)
+          when Hash
+            return choice_result(value) if value.keys.map(&:to_s).all? { |k| keys.include?(k) }
+          end
         end
 
         raise JudgeError, "Stub has no choice answer for criteria #{keys.inspect}"

@@ -12,23 +12,23 @@ module Feelings
       @memo = {}
     end
 
-    def like?(arg = nil, at_least: nil, **rest)
+    def like?(arg = nil, at_least: nil, confidence: nil, **rest)
       hash = batch_hash(arg, rest)
-      return batch(hash, at_least: at_least).transform_values { |result| coerce_bool(result) } if hash
+      if hash
+        return batch(hash, at_least: at_least, confidence: confidence).transform_values { |result| coerce_bool(result) }
+      end
 
-      ask_mood(arg, at_least: at_least, banded: false).to_bool
+      ask_mood(arg, at_least: at_least).to_bool
     end
 
-    def like(arg = nil, at_least: nil, **rest, &block)
+    def like(arg = nil, at_least: nil, confidence: nil, **rest, &block)
       hash = batch_hash(arg, rest)
-      return batch(hash, at_least: at_least) if hash
+      return batch(hash, at_least: at_least, confidence: confidence) if hash
 
-      banded = at_least.nil? && block && BlockIntrospection.declares_maybe?(block)
-      mood = ask_mood(arg, at_least: at_least, banded: banded)
+      mood = ask_mood(arg, at_least: at_least)
       return mood unless block
 
-      block.call(mood)
-      mood.ran? ? mood.result : nil
+      mood.collect(&block)
     end
 
     def most_like(*args, confidence: nil, **rest)
@@ -86,31 +86,29 @@ module Feelings
       end
     end
 
-    def ask_mood(description, at_least:, banded:)
-      key = [:noul, description, at_least, banded]
-      @memo[key] ||= begin
-        resolved = resolve_description(description)
-        answers = Engine.call(value: @resolved_state, specs: { sole: { kind: :noul, description: resolved } })
-        build_mood(answers[:sole], resolved, at_least: at_least, banded: banded)
-      end
+    # Raw answers are memoized per question so a second ask with a different
+    # threshold reuses the judgment instead of paying for another request.
+    def ask_mood(description, at_least:)
+      resolved = resolve_description(description)
+      answer = @memo[[:noul, resolved]] ||=
+        Engine.call(value: @resolved_state, specs: { sole: { kind: :noul, description: resolved } })[:sole]
+      build_mood(answer, resolved, at_least: at_least)
     end
 
     def ask_pick(labels, confidence:)
-      key = [:choice, labels, confidence]
-      @memo[key] ||= begin
-        answers = Engine.call(value: @resolved_state, specs: { sole: { kind: :choice, labels: labels } })
-        build_pick(answers[:sole], confidence: confidence)
-      end
+      answer = @memo[[:choice, labels]] ||=
+        Engine.call(value: @resolved_state, specs: { sole: { kind: :choice, labels: labels } })[:sole]
+      build_pick(answer, confidence: confidence)
     end
 
-    def build_mood(answer, description, at_least:, banded:)
-      label = Engine.classify(answer[:probability], at_least: at_least, banded: banded, draw: answer[:draw])
+    def build_mood(answer, description, at_least:)
       Mood.new(
-        label: label,
         probability: answer[:probability],
         description: description,
         value: value,
-        model: answer[:model]
+        model: answer[:model],
+        at_least: at_least,
+        draw: answer[:draw]
       )
     end
 
@@ -143,7 +141,7 @@ module Feelings
       answers = Engine.call(value: @resolved_state, specs: specs)
       answers.each_with_object({}) do |(id, answer), results|
         results[id] = if specs[id][:kind] == :noul
-                         build_mood(answer, descriptions[id], at_least: at_least, banded: false)
+                         build_mood(answer, descriptions[id], at_least: at_least)
                        else
                          build_pick(answer, confidence: confidence)
                        end

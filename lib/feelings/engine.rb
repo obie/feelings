@@ -114,21 +114,20 @@ module Feelings
       answers
     end
 
-    # Classifies a Noul probability into "yes"/"maybe"/"no", honoring
-    # at_least:, an auto-banded maybe zone (0.3/0.7), or a plain 0.5 split.
+    # Classifies a Noul probability into "yes"/"maybe"/"no". With at_least:
+    # or the auto bands, anything strictly inside the uncertain zone is
+    # "maybe" before any sampling happens. Outside that zone a chaos draw
+    # samples yes with probability p; otherwise yes wins at or above the
+    # floor (0.5 when no floor is set).
     def classify(probability, at_least: nil, banded: false, draw: nil)
       if at_least || banded
         threshold = at_least || 0.7
-        lower = 1 - threshold
-        upper = threshold
-        return "yes" if probability >= upper
-        return "no" if probability <= lower
-        return "maybe" unless draw
-
-        draw < probability ? "yes" : "no"
-      else
-        probability >= 0.5 ? "yes" : "no"
+        return "maybe" if probability < threshold && probability > 1 - threshold
       end
+
+      return (draw < probability ? "yes" : "no") if draw
+
+      probability >= (at_least || 0.5) ? "yes" : "no"
     end
 
     def symbolize(hash)

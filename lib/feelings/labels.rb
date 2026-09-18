@@ -40,8 +40,9 @@ module Feelings
         raise BadLabels, "labels must have 2..255 entries, got #{labels.is_a?(Hash) ? labels.size : labels.class}"
       end
 
-      if labels.keys.all? { |key| key.to_s =~ /\A\d+\z/ }
-        raise BadLabels, "labels must not be numeric-only symbols"
+      numeric = labels.values.select { |description| description.is_a?(String) && description.strip.match?(/\A\d+\z/) }
+      unless numeric.empty?
+        raise BadLabels, "label descriptions must describe the option in words, got numeric-only #{numeric.inspect}"
       end
 
       labels

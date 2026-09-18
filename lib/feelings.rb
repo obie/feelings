@@ -13,7 +13,6 @@ require_relative "feelings/mood"
 require_relative "feelings/pick"
 require_relative "feelings/tape"
 require_relative "feelings/match_builder"
-require_relative "feelings/block_introspection"
 require_relative "feelings/engine"
 require_relative "feelings/about"
 require_relative "feelings/judges/stub"
@@ -126,7 +125,7 @@ module Feelings
       Thread.current[:feelings_replay]
     end
 
-    def while(initial, description, max: 10)
+    def while(initial, description, max: 5)
       raise ArgumentError, "max must be between 1 and 50" unless (1..50).cover?(max)
 
       current = initial

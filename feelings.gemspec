@@ -20,7 +20,6 @@ Gem::Specification.new do |spec|
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2"
 
-  spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = spec.homepage
 
   spec.files = Dir.chdir(__dir__) do
@@ -32,6 +31,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "ruby_decision_model", "~> 0.1"
+
+  spec.add_development_dependency "minitest", "~> 5.0"
+  spec.add_development_dependency "rake", "~> 13.0"
 
   spec.metadata["rubygems_mfa_required"] = "true"
 end

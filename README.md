@@ -164,3 +164,18 @@ Feelings(email).like?("spam") # => true, no network call
 ## Status
 
 0.0.1. The API above is the whole surface.
+
+## Releasing
+
+Publishing runs through RubyGems trusted publishing, so no API key is stored
+anywhere. To ship a version:
+
+1. Bump `lib/feelings/version.rb`.
+2. Add the version to `CHANGELOG.md`.
+3. Merge to `main`. The Release workflow runs the suite, builds the gem with
+   `gem build --strict`, checks the built gem carries every file under
+   `lib/`, and pushes it. A version already on RubyGems is skipped, so the
+   workflow is safe to re-run.
+
+The same workflow can be started by hand from the Actions tab or with
+`gh workflow run release.yml`.
