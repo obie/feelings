@@ -163,7 +163,7 @@ Feelings(email).like?("spam") # => true, no network call
 
 ## Status
 
-0.0.1. The API above is the whole surface.
+0.1.0. The API above is the whole surface.
 
 ## Releasing
 
