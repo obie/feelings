@@ -1,0 +1,5 @@
+kinds:
+  invitation: an invitation to an event
+  sales_pitch: someone selling something
+  other: anything else
+spam: an unsolicited commercial email
