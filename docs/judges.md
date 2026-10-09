@@ -33,8 +33,9 @@ Feelings::Judges::DecisionModel.new(RubyDecisionModel::Client.new)
 ```
 
 `Feelings.judge`, called with no judge yet assigned, builds one of these automatically around
-`RubyDecisionModel.client` (the memoized default client, which auto-detects `OPENROUTER_API_KEY`
-or `TYPESAFE_API_KEY`).
+`RubyDecisionModel.client`, the memoized default client. It reads `RUBY_DECISION_MODEL_PROVIDER`
+first, then looks for `TYPESAFE_API_KEY`, `OPENROUTER_API_KEY` and `SYSTEM_ONE_BASE_URL` in that
+order.
 
 ### How it maps errors
 
@@ -47,9 +48,9 @@ regardless of which provider or failure mode was underneath.
 
 ## Providers
 
-`RubyDecisionModel::Client` talks to a decision model provider, selected by whichever of
-`OPENROUTER_API_KEY` / `TYPESAFE_API_KEY` is set in the environment (or picked explicitly with
-`provider:`). `feelings` doesn't touch provider selection itself; that's entirely
+`RubyDecisionModel::Client` talks to a decision model provider: Typesafe, OpenRouter, OpenAI,
+Cloudflare, Perplexity, Databricks or a System One server. It picks one from the environment as
+described above, or you name it with `provider:`. `feelings` doesn't touch provider selection itself; that's entirely
 `ruby_decision_model`'s job, wrapped by `Judges::DecisionModel`.
 
 ## Writing your own judge

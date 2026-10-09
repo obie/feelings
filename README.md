@@ -5,8 +5,9 @@ A decision model can answer a typed question about a value with a calibrated pro
 an `if` can ask one of those questions directly instead of hand-rolling a prompt. `feelings`
 brings that construct, `feels`, to Ruby. Inspired by Probably.
 
-It works with Jev through OpenRouter or Typesafe's API via
-[ruby_decision_model](https://rubygems.org/gems/ruby_decision_model), the default judge.
+The default judge is [ruby_decision_model](https://rubygems.org/gems/ruby_decision_model), so
+`feelings` works with every decision model it reaches: Typesafe's Jev, OpenAI's gpt-6-luna,
+Cloudflare's Clef, Perplexity's pplx-decider, Databricks and self-hosted System One servers.
 
 ## Install
 
@@ -18,7 +19,9 @@ gem "feelings"
 
 No configuration is required beyond an API key. Set `OPENROUTER_API_KEY` or
 `TYPESAFE_API_KEY` in your environment and `feelings` picks a judge automatically the first
-time you ask it something.
+time you ask it something. For another vendor, set `RUBY_DECISION_MODEL_PROVIDER` to its name
+(`openai`, `cloudflare`, `perplexity`, `databricks` or `system_one`) along with that vendor's
+own key.
 
 ```ruby
 require "feelings"

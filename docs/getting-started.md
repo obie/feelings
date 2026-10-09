@@ -18,8 +18,12 @@ gem "feelings"
 No configuration is required beyond an API key. Set `OPENROUTER_API_KEY` or `TYPESAFE_API_KEY`
 in your environment. `feelings` depends on [ruby_decision_model](https://rubygems.org/gems/ruby_decision_model),
 which picks a provider automatically based on whichever key is present, and builds the default
-judge the first time you ask it something. It works with Jev through OpenRouter or through
-Typesafe's own API.
+judge the first time you ask it something.
+
+To use OpenAI's gpt-6-luna, Cloudflare's Clef, Perplexity's pplx-decider, Databricks or a
+self-hosted System One server, set `RUBY_DECISION_MODEL_PROVIDER` to `openai`, `cloudflare`,
+`perplexity`, `databricks` or `system_one`, plus that vendor's own key. The
+ruby_decision_model README lists the variables each one reads.
 
 ## Your first question
 
